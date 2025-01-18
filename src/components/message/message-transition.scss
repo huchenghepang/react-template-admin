@@ -1,0 +1,23 @@
+/* message-transition.scss */
+.message-enter {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.message-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 300ms ease-in, opacity 300ms ease-in;
+}
+
+.message-exit {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+.message-exit-active {
+  transform: translateY(-100%);
+    // margin-top: -20px;
+  opacity: 0;
+  transition: transform 300ms ease-in, opacity 300ms ease-in;
+}
