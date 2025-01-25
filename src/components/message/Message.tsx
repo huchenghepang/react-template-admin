@@ -1,45 +1,80 @@
-import React, { CSSProperties, useEffect } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import "./message-transition.scss";
 import MessageStyle from "./Message.module.scss";
 
 interface MessageProps {
-  /* 消息的id */
   id: number;
-  /* 消息内容 */
   message: string;
-  /* 消息的持续时间 */
+  style?: React.CSSProperties;
   duration?: number;
-  /* 消息的样式 */
-  style?: CSSProperties;
-  /* 消息的位置 */
-  position?: { top: string; left: string; transform?: string };
-  /* 关闭消息的回调 */
-  onClose: (id: number) => void;
+  Icon?:  React.ReactNode;
+  onRemove: (id: number) => void; // 用于触发父组件移除消息
 }
 
-const Message: React.FC<MessageProps> = ({
+const MessageMemo: React.FC<MessageProps> = ({
   id,
   message,
-  duration = 3000,
   style,
-  onClose,
-}: MessageProps) => {
+  onRemove,
+  duration,
+  Icon,
+}) => {
+  const [animationClass, setAnimationClass] = useState("message-item-enter");
+  const refDiv = useRef<HTMLDivElement | null>(null);
+
+  // 触发退出动画
+  const handleExit = () => {
+    setAnimationClass("message-item-exit");
+  };
 
   useEffect(() => {
-    const removeTimer = setTimeout(() => {
-
-      onClose(id);
-    }, duration );
-
+    const timer = setTimeout(() => {
+      handleExit();
+    }, duration || 3000);
     return () => {
-      clearTimeout(removeTimer);
+      clearTimeout(timer);
     };
-  }, [duration, onClose, id]);
+  }, [duration]);
 
-  return (
-   <div className={MessageStyle["Message-Item"]} style={{ ...style }}>
-      {message}
-    </div>
+  // 当退出动画结束时，通知父组件移除
+  useEffect(() => {
+    const div = refDiv.current;
+    const handleAnimationEnd = (event: AnimationEvent) => {
+      if (event.animationName === "message-exit-animation") {
+        onRemove(id);
+      }
+    };
+    div?.addEventListener("animationend", handleAnimationEnd);
+    return () => {
+      div?.removeEventListener("animationend", handleAnimationEnd);
+    };
+  }, [id, onRemove]);
+
+
+
+  return useMemo(
+    () => (
+      <div
+        ref={refDiv}
+        key={id}
+        className={`${MessageStyle["Message-Item"]} ${animationClass}`}
+        style={{ ...style }}
+      >
+        {Icon && (
+          <div
+            className={MessageStyle["Message-Icon"]}
+            style={{ width: "24px", height: "24px" }}
+          >
+            {Icon} {/* 直接渲染传入的 Icon JSX 元素 */}
+          </div>
+        )}
+        <span>{message}</span>
+      </div>
+    ),
+    [id, style, message, refDiv, animationClass, Icon],
   );
 };
+
+const Message=  memo(MessageMemo);
 
 export default Message;

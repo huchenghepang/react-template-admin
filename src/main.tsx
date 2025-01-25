@@ -1,15 +1,19 @@
+import "normalize.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 import App from "./App";
-import { MessageProvider } from "./components/message/MessageManager";
 import "./index.scss";
+import { store } from "./store";
 
 const root = document.getElementById("root");
 
 createRoot(root!).render(
   <StrictMode>
-    <MessageProvider>
-      <App />
-    </MessageProvider>
+
+      <Provider store={store}>
+        <App></App>
+      </Provider>
+
   </StrictMode>,
 );

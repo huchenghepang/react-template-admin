@@ -2,16 +2,23 @@
   background-color: #87CEEB; /* 天蓝色 */
   color: #FAFAFA; /* 字体颜色 */
   padding: 5px 10px;
-  border-radius: 6px; /* 圆角 */
+  border-radius: 8px; /* 圆角 */
   white-space: nowrap;
   font-size: 16px;
   display: inline-block;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;  
   user-select: none;
-  margin-bottom: 8px;
+  margin-bottom: 15px;
   transition: transform 0.3s ease, opacity 0.3s ease; 
-  animation: fadeIn 0.3s ease-in-out forwards;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+
+.Message-Icon{
+ display: flex;
+ align-items: center;
+}

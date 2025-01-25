@@ -1,127 +1,127 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-import "./message-transition.scss";
-import MessageStyle from "./Message.module.scss";
-import MessageManagerStyle from "./MessageManager.module.scss";
-interface Message {
+import React from "react";
+import { createRoot, Root } from "react-dom/client";
+import { MessageComponentIcon } from "../../types/iconfont";
+import IconFont from "../Iconfont/Iconfont";
+import MessageManagerContainer from "./MessageManagerContainer";
+
+export interface MessageItem {
   id: number;
   message: string;
   duration: number;
+  Icon?: React.ReactNode;
   style: React.CSSProperties;
 }
 
-interface MessageContextType {
-  addMessage: (message: Omit<Message, "id">) => void;
-  showMessage:ShowMessageFunc
-}
+class MessageManager {
+  private idCounter = 0;
+  container: HTMLDivElement | null = null;
+  private root: Root | null = null;
 
-interface ShowMessageParams {
-  type: "success" | "error" | "info" | "tip";
-  message: string;
-  duration?: number;
-}
+  // 用于在 React 中管理消息状态
+  private addMessageCallback: React.Dispatch<
+    React.SetStateAction<MessageItem[]>
+  > | null = null;
 
-type ShowMessageFunc  = (options: ShowMessageParams) => void
-
-const MessageContext = createContext<MessageContextType | undefined>(undefined);
-
-export const useMessage = () => {
-  const context = useContext(MessageContext);
-  if (!context) {
-    throw new Error("useMessage must be used within a MessageProvider");
+  constructor() {
+    this.initContainer();
   }
-  return context;
-};
 
-export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [idCounter, setIdCounter] = useState(0);
+  private initContainer() {
+    const container = document.createElement("div");
+    container.id = "message-container";
+    document.body.appendChild(container);
+    this.container = container;
 
-  // 添加消息到队列
-  const addMessage = useCallback(
-    (newMessage: Omit<Message, "id">) => {
-      const id = idCounter;
-      setIdCounter((prev) => prev + 1);
-      // 添加到消息队列
-      setMessages((prev) => [...prev, { ...newMessage, id }]);
+    // 初始化 React 渲染
+    this.root = createRoot(container);
+    this.root.render(
+      <MessageManagerContainer
+        destroyCallback={this.destroy}
+        registerCallback={this.registerAddMessageCallback}
+      />,
+    );
+  }
 
-      // 定时移除消息
-      setTimeout(() => {
-        setMessages((prev) => prev.slice(1));
-      }, newMessage.duration);
-    },
-    [idCounter],
-  );
-
-  const showMessage: ShowMessageFunc = ({ type, message, duration = 3000 }) => {
-    let style: React.CSSProperties = {};
-
-    switch (type) {
-      case "success":
-        style = { backgroundColor: "#4CAF50", color: "#fff" };
-        break;
-      case "error":
-        style = { backgroundColor: "#F44336", color: "#fff" };
-        break;
-      case "info":
-        style = { backgroundColor: "#2196F3", color: "#fff" };
-        break;
-      case "tip":
-        style = { backgroundColor: "#FFC107", color: "#fff" };
-        break;
-    }
-
-    addMessage({
-      message: message || `Default ${type} message`,
-      duration,
-      style,
-    });
+  private registerAddMessageCallback = (
+    callback: React.Dispatch<React.SetStateAction<MessageItem[]>>,
+  ) => {
+    this.addMessageCallback = callback;
   };
 
-  return (
-    <MessageContext.Provider value={{ addMessage, showMessage }}>
-      {children}
-      <MessageList messages={messages} />
-    </MessageContext.Provider>
-  );
-};
+  public addMessage(message: Omit<MessageItem, "id">) {
+    if (this.addMessageCallback) {
+      const id = this.idCounter++;
+      this.addMessageCallback((prevMessages) => [
+        ...prevMessages,
+        { ...message, id },
+      ]);
+    }
+  }
 
-interface MessageListProps {
-  messages: Message[];
+  // 移除MessageManager实例及其渲染的容器
+  public destroy = () => {
+    // 使用 setTimeout 延迟卸载操作，确保 React 渲染完成后再执行
+    setTimeout(() => {
+      if (this.root) {
+        this.root.unmount(); // 延迟卸载 React 渲染
+        this.root = null;
+      }
+
+      if (this.container) {
+        document.body.removeChild(this.container); // 从 DOM 中移除容器
+        this.container = null;
+      }
+
+      // 清除回调
+      this.addMessageCallback = null;
+    }, 0);
+  };
 }
 
-// 消息列表组件
-const MessageList: React.FC<MessageListProps> = ({ messages }) => {
-  const nodeRef = useRef(null);
+// 单例导出
+let messageManager = new MessageManager();
 
-  return (
-    <TransitionGroup className={MessageManagerStyle["Message-Manager"]}>
-      {messages.map((msg, index) => (
-        <CSSTransition
-          key={msg.id}
-          timeout={300}
-          classNames="message"
-          nodeRef={nodeRef}
-          unmountOnExit
-        >
-          <div
-            ref={nodeRef} // 使用该 ref 来应用动画
-            style={msg.style}
-            className={MessageStyle["Message-Item"]}
-          >
-            {msg.message}
-            {index}
-          </div>
-        </CSSTransition>
-      ))}
-    </TransitionGroup>
-  );
+export const showMessage = ({
+  type,
+  text,
+  duration = 3000,
+}: {
+  type: "success" | "error" | "info" | "tip";
+  text: string;
+  duration?: number;
+}) => {
+  // 如果 MessageManager 被销毁，则重新创建实例
+  if (!messageManager.container) {
+    messageManager = new MessageManager(); // 重新初始化
+  }
+
+  let style: React.CSSProperties = {};
+  let iconName: MessageComponentIcon;
+  switch (type) {
+    case "success":
+      style = { backgroundColor: "#4CAF50", color: "#fff" };
+      iconName = "icon-success";
+      break;
+    case "error":
+      style = { backgroundColor: "#F44336", color: "#fff" };
+      iconName = "icon-error";
+      break;
+    case "info":
+      style = { backgroundColor: "#2196F3", color: "#fff" };
+      iconName = "icon-tixing";
+      break;
+    case "tip":
+      style = { backgroundColor: "#FFC107", color: "#fff" };
+      iconName = "icon-tips";
+      break;
+  }
+
+  messageManager.addMessage({
+    message: text,
+    duration,
+    style,
+    Icon: <IconFont name={iconName}></IconFont>,
+  });
 };
+
+export default messageManager;

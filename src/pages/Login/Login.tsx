@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import IconFont from "../../components/Iconfont/Iconfont";
+
+import { showMessage } from "../../components/message/MessageManager";
 import { useFormReducer } from "../../hooks/useFormReducer";
 import { registerAddSchema } from "../../schema/user";
 import { validate } from "../../schema/validate";
+import { reqLogin } from "../../serices/api/auth";
+import { RootState } from "../../store";
+import { loginIn, updateUserInfo } from "../../store/slices/userSlice";
+import { setLocalStorage } from "../../utils/localStorage";
 import loginStyle from "./Login.module.scss";
 
 // 定义组件的 Props 类型
@@ -17,6 +25,15 @@ interface FormType {
 
 // 根据文件名生成组件
 const Login: React.FC<LoginProps> = () => {
+  const isLogin = useSelector((state: RootState) => state.user.isLogin);
+  const navigate = useNavigate();
+  useEffect(() => {
+    // 如果用户已经登录，跳转到 Dashboard 页面
+    if (isLogin) {
+      void navigate("/dashboard");
+    }
+  }, [isLogin, navigate]);
+
   const [isGithubLogin, setIsGithubLogin] = useState(false);
 
   const [errors, setErrors] = useState<FormType>({});
@@ -24,7 +41,7 @@ const Login: React.FC<LoginProps> = () => {
   const toggleLoginMethod = () => {
     setIsGithubLogin(!isGithubLogin);
   };
-
+  const dispatch = useDispatch();
   // 账号和密码
   const { formState, handleChange, resetForm } = useFormReducer({
     account: "",
@@ -32,8 +49,9 @@ const Login: React.FC<LoginProps> = () => {
   });
 
   /* 提交表单 */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+
     validate(registerAddSchema, formState)
       .then(({ valid, errors }) => {
         if (!valid) {
@@ -43,13 +61,37 @@ const Login: React.FC<LoginProps> = () => {
               [error.errorName]: error.message,
             }));
           });
-          return;
+          resetForm();
+          return Promise.reject(new Error("字段验证失败"));
         }
         resetForm();
-        alert("登录成功");
+        // 发起登录请求
+        return reqLogin(formState);
       })
-      .catch((error) => {
+      .then(({ success, errorMessage, data }) => {
+        if (!success)
+          showMessage({
+            type: "tip",
+            text: "登录失败," + errorMessage,
+          });
+
+        /* 登录成功处理数据 */
+        showMessage({
+          type: "success",
+          text: "登录成功,欢迎您，" + data.userData.username,
+        });
+
+        /* 保存token */
+        setLocalStorage("token", data.token);
+        /* 保存用户信息 */
+        dispatch(updateUserInfo(data.userData));
+        dispatch(loginIn(null));
+        /* 跳转管理面板 */
+        void navigate("/dashboard");
+      })
+      .catch((error: Error) => {
         console.error(error);
+        showMessage({ type: "error", text: error.message });
       });
   };
 
@@ -89,6 +131,7 @@ const Login: React.FC<LoginProps> = () => {
             placeholder="手机号或邮箱"
             onFocus={resetError}
             onChange={handleChange}
+            autoComplete="account"
             required
             className={loginStyle["Login-Input"]}
           />
@@ -98,6 +141,7 @@ const Login: React.FC<LoginProps> = () => {
           <input
             type="password"
             value={formState.password}
+            autoComplete="password"
             onChange={handleChange}
             onFocus={resetError}
             className={loginStyle["Login-Input"]}

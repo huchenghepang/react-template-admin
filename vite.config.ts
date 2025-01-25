@@ -8,7 +8,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': "./src",
-
+    },
+  },
+  server:{
+    open:false,
+    port:5142,
+    host:"localhost",
+    proxy:{
+      "/api":{
+        target:"http://localhost:3000",
+        changeOrigin: true, 
+      }
     }
   }
 });

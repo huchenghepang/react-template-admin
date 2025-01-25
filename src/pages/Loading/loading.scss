@@ -1,0 +1,55 @@
+/* 全屏加载页面的样式 */
+.loading-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* 使用柔和渐变色 */
+  color: #fff;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  transition: background-color 0.3s ease-in-out; /* 背景颜色渐变过渡 */
+}
+
+/* 加载动画的圆圈 */
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-top: 8px solid #fff;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+
+/* 加载文字样式 */
+.loading-text {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+  animation: fadeIn 1.5s ease-in-out infinite;
+}
+
+/* 加载动画旋转效果 */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 渐变效果 */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}

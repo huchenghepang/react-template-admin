@@ -41,7 +41,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-empty-object-type": "off", // 允许对象为空，你可以修改为 'warn' 或 'off'
-      "prettier/prettier": ["off", { "endOfLine": "auto" }]
+      "prettier/prettier": ["off", { "endOfLine": "auto" }],
+       "@typescript-eslint/no-explicit-any": "off",
     },
   },
 );

@@ -1,23 +1,34 @@
-/* message-transition.scss */
-.message-enter {
-  transform: translateY(-100%);
-  opacity: 0;
+/* message-transition.css */
+
+/* 定义进入动画 */
+@keyframes message-enter-animation {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.message-enter-active {
-  transform: translateY(0);
-  opacity: 1;
-  transition: transform 300ms ease-in, opacity 300ms ease-in;
+/* 定义退出动画 */
+@keyframes message-exit-animation {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
 }
 
-.message-exit {
-  transform: translateY(0%);
-  opacity: 1;
+/* 为元素应用动画 */
+.message-item-enter {
+  animation: message-enter-animation 0.3s ease-in forwards;
 }
 
-.message-exit-active {
-  transform: translateY(-100%);
-    // margin-top: -20px;
-  opacity: 0;
-  transition: transform 300ms ease-in, opacity 300ms ease-in;
+.message-item-exit {
+  animation: message-exit-animation 0.3s ease-in forwards;
 }
