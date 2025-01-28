@@ -1,13 +1,18 @@
-import React, { memo, MouseEventHandler, ReactEventHandler, useEffect, useMemo } from "react";
-import { MessageComponentIcon, ReactTemplateIcon, SearchIcon } from "../../types/iconfont";
+import React, { memo, MouseEventHandler, useEffect, useMemo } from "react";
+import {
+  MessageComponentIcon,
+  ReactTemplateIcon,
+  SearchFrameIcon,
+} from "../../types/iconfont";
 
 const iconfontUrl = [
   "//at.alicdn.com/t/c/font_4801317_9kjpq3ujtxs.js",
   "//at.alicdn.com/t/c/font_4817510_wp7edr2vfj.js",
   "//at.alicdn.com/t/c/font_4818206_a49yat5yptg.js",
+  "https://at.alicdn.com/t/c/font_4801317_zom0gpxkxkk.js",
 ];
 
-export type IconName = MessageComponentIcon | ReactTemplateIcon | SearchIcon;
+export type IconName = MessageComponentIcon | ReactTemplateIcon | SearchFrameIcon;
 
 const createScriptUrlElements = (scriptUrls: string[], index = 0) => {
   const currentScriptUrl = scriptUrls[index];

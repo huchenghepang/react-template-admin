@@ -1,7 +1,35 @@
 import { FC } from "react";
+import IconFont from "../../components/Iconfont/Iconfont";
+import NavItem from "../../components/navitem/NavItem";
 import "./sidebar.scss";
+import MultiLevelNav, {
+  MultiLevelNavProps,
+} from "../../components/navitem/MultiLevelNav";
 
 export const Sidebar: FC = () => {
+  const children: MultiLevelNavProps[] = [
+    {
+      text: "你好",
+      leftIcon: "icon-components",
+      childrenInfo: [
+        { text: "你好", leftIcon: "icon-components" },
+        { text: "你好", leftIcon: "icon-components" },
+        {
+          text: "你好",
+          leftIcon: "icon-components",
+          childrenInfo: [
+            { text: "你好", leftIcon: "icon-components" },
+            { text: "你好", leftIcon: "icon-components" },
+            { text: "你好", leftIcon: "icon-components" },
+          ],
+        },
+      ],
+    },
+    { text: "你好", leftIcon: "icon-components" },
+    { text: "你好", leftIcon: "icon-components" },
+    { text: "你好", leftIcon: "icon-components" },
+  ];
+
   return (
     <aside className="sidebar-container clearfix">
       <div className="dashboard-title clearfix">
@@ -11,32 +39,27 @@ export const Sidebar: FC = () => {
         <div className="home-section sidebar-section">
           <h3 className="sidebar-title-3">Home</h3>
           <div className="section-detail">
-            <div className="sidebar-nav-item sidebar-nav-active-item">
-              <div className="left-info"></div>
-              <div className="middle">
-                <span className="iconfont">DashBoard</span>
-              </div>
-              <span className="right-info" />
-            </div>
-            <div className="sidebar-nav-item">
-              <div className="left-info"></div>
-              <div className="middle">
-                <span>Menu Style</span>
-              </div>
-              <div className="right-info"></div>
-            </div>
+            <NavItem
+              text="主页"
+              active={true}
+              leftElement={<IconFont name="icon-github"></IconFont>}
+              rightElement={<IconFont name="icon-github"></IconFont>}
+            ></NavItem>
+            <NavItem
+              text="菜单样式"
+              leftElement={<IconFont name="icon-github"></IconFont>}
+              rightElement={<IconFont name="icon-right"></IconFont>}
+            ></NavItem>
           </div>
         </div>
         <div className="pages-section sidebar-section">
           <h3 className="sidebar-title-3">Pages</h3>
           <div className="section-detail">
-            <div className="sidebar-nav-item">
-              <div className="left-info"></div>
-              <div className="middle">
-                <span>Example</span>
-              </div>
-              <div className="right-info"></div>
-            </div>
+            <MultiLevelNav
+              leftIcon="icon-menu"
+              text="example"
+              childrenInfo={children}
+            ></MultiLevelNav>
             <div className="sidebar-nav-item">
               <div className="left-info"></div>
               <div className="middle">

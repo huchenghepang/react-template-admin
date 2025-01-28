@@ -16,6 +16,7 @@ class MessageManager {
   private idCounter = 0;
   container: HTMLDivElement | null = null;
   private root: Root | null = null;
+  private messageQueue: Omit<MessageItem, "id">[] = []; // 临时队列
 
   // 用于在 React 中管理消息状态
   private addMessageCallback: React.Dispatch<
@@ -46,34 +47,42 @@ class MessageManager {
     callback: React.Dispatch<React.SetStateAction<MessageItem[]>>,
   ) => {
     this.addMessageCallback = callback;
+
+    // 如果有消息在队列中，立即处理
+    if (this.messageQueue.length > 0) {
+      this.messageQueue.forEach((message) => this.addMessage(message));
+      this.messageQueue = []; // 清空队列
+    }
   };
 
   public addMessage(message: Omit<MessageItem, "id">) {
+    const id = this.idCounter++;
+    const newMessage = { ...message, id };
+
+    // 如果回调已注册，直接添加消息
     if (this.addMessageCallback) {
-      const id = this.idCounter++;
-      this.addMessageCallback((prevMessages) => [
-        ...prevMessages,
-        { ...message, id },
-      ]);
+      this.addMessageCallback((prevMessages) => [...prevMessages, newMessage]);
+    } else {
+      // 如果回调尚未注册，暂存到队列
+      this.messageQueue.push(message);
     }
   }
 
-  // 移除MessageManager实例及其渲染的容器
+  // 移除 MessageManager 实例及其渲染的容器
   public destroy = () => {
-    // 使用 setTimeout 延迟卸载操作，确保 React 渲染完成后再执行
     setTimeout(() => {
       if (this.root) {
-        this.root.unmount(); // 延迟卸载 React 渲染
+        this.root.unmount();
         this.root = null;
       }
 
       if (this.container) {
-        document.body.removeChild(this.container); // 从 DOM 中移除容器
+        document.body.removeChild(this.container);
         this.container = null;
       }
 
-      // 清除回调
       this.addMessageCallback = null;
+      this.messageQueue = []; // 清空消息队列
     }, 0);
   };
 }
@@ -90,7 +99,6 @@ export const showMessage = ({
   text: string;
   duration?: number;
 }) => {
-  // 如果 MessageManager 被销毁，则重新创建实例
   if (!messageManager.container) {
     messageManager = new MessageManager(); // 重新初始化
   }
@@ -117,7 +125,7 @@ export const showMessage = ({
   }
 
   messageManager.addMessage({
-    message: text,
+    message: text,                            
     duration,
     style,
     Icon: <IconFont name={iconName}></IconFont>,
@@ -125,3 +133,4 @@ export const showMessage = ({
 };
 
 export default messageManager;
+

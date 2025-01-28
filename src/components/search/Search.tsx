@@ -42,7 +42,9 @@ const Search: React.FC<SearchProps> = ({
           onKeyDown={onEnterHanlder}
           id="search-nav-top"
         />
-        <IconFont name="search-cancel" onClick={resetForm}></IconFont>
+        {formState.searchValue.length>0 && (
+          <IconFont name="search-cancel" onClick={resetForm}></IconFont>
+        )}
       </div>
     ),
     [formState.searchValue, handleChange, resetForm, onEnterHanlder],

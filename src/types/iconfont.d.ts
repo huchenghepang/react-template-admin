@@ -1,6 +1,18 @@
 /**
+ * 项目名: 搜索框
+ * 英文名: Search frame
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4818206
+ * 在线地址: https://at.alicdn.com/t/c/font_4818206_a49yat5yptg.js
+ */
+export type SearchFrameIcon =
+    | "search-cancel"
+    | "search-sousuo"
+    ;
+/**
  * 项目名: 消息组件
  * 英文名: Message component
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4817510
+ * 在线地址: https://at.alicdn.com/t/c/font_4817510_wp7edr2vfj.js
  */
 export type MessageComponentIcon =
     | "icon-tips"
@@ -8,11 +20,11 @@ export type MessageComponentIcon =
     | "icon-error"
     | "icon-success"
     ;
-
-export type SearchIcon = "search-cancel" | "search-sousuo"    
 /**
  * 项目名: react-template
  * 英文名: react-template
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4801317
+ * 在线地址: https://at.alicdn.com/t/c/font_4801317_u5cjxznanff.js
  */
 export type ReactTemplateIcon =
     | "icon-ok-circle"
@@ -30,10 +42,13 @@ export type ReactTemplateIcon =
     | "icon-fenlei"
     | "icon-fanhui"
     | "icon-github"
+    | "icon-top"
     ;
 /**
  * 项目名: 电脑文件夹图标
  * 英文名: Computer folder icon
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4784071
+ * 在线地址: https://at.alicdn.com/t/c/font_4784071_w401t7e7eq9.js
  */
 export type ComputerFolderIconIcon =
     | "icon-docker"
@@ -57,6 +72,8 @@ export type ComputerFolderIconIcon =
 /**
  * 项目名: 个人博客
  * 英文名: Personal blog
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4727993
+ * 在线地址: https://at.alicdn.com/t/c/font_4727993_4qfizwyn9rj.js
  */
 export type PersonalBlogIcon =
     | "icon-biaoqian"
@@ -102,6 +119,8 @@ export type PersonalBlogIcon =
 /**
  * 项目名: 音乐播放器
  * 英文名: Music player
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4708930
+ * 在线地址: https://at.alicdn.com/t/c/font_4708930_nihm5tj1hig.js
  */
 export type MusicPlayerIcon =
     | "icon-list"
@@ -111,6 +130,8 @@ export type MusicPlayerIcon =
 /**
  * 项目名: 同城送花
  * 英文名: Flowers in the same city
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4667592
+ * 在线地址: https://at.alicdn.com/t/c/font_4667592_gl2jcsmq5b.js
  */
 export type FlowersInTheSameCityIcon =
     | "icon-zhuye"
@@ -119,6 +140,8 @@ export type FlowersInTheSameCityIcon =
 /**
  * 项目名: 聊天框
  * 英文名: Chat box
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4656378
+ * 在线地址: https://at.alicdn.com/t/c/font_4656378_3ii8jeclxcs.js
  */
 export type ChatBoxIcon =
     | "icon-iconemojo"
@@ -127,6 +150,8 @@ export type ChatBoxIcon =
 /**
  * 项目名: svg
  * 英文名: svg
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4595128
+ * 在线地址: https://at.alicdn.com/t/c/font_4595128_1gqqq7nv6ej.js
  */
 export type SvgIcon =
     | "icon-down"
@@ -135,10 +160,4 @@ export type SvgIcon =
     | "icon-fendouzhe"
     | "icon-info"
     ;
-/**
- * 项目名: svg
- * 英文名: svg
- */
-export type SvgIcon =
-    | "icon-info"
-    ;
+
