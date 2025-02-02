@@ -1,8 +1,14 @@
 .sidebar-container {
   width: 257px;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #fff;
   user-select: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar{
+    width: 0px;
+  }  
   .dashboard-title {
     height: 78px;
     border-bottom: 1px solid #e6e9ee;

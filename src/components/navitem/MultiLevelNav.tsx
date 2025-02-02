@@ -1,4 +1,5 @@
 import React, { memo, useCallback, useState } from "react";
+import { To } from "react-router-dom";
 import IconFont, { IconName } from "../Iconfont/Iconfont";
 import MultiLevelNavStyle from "./MultiLevelNav.module.scss";
 import NavItem from "./NavItem";
@@ -10,6 +11,7 @@ export interface MultiLevelNavProps {
   leftIcon?: IconName;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   childrenInfo?: MultiLevelNavProps[];
+  to?:To;
 }
 
 // 根据文件名生成组件
@@ -18,6 +20,7 @@ const MultiLevelNav: React.FC<MultiLevelNavProps> = ({
   active,
   leftIcon,
   onClick,
+  to,
   childrenInfo,
 }: MultiLevelNavProps) => {
   const [isExpanded, setExpanded] = useState(false);
@@ -32,6 +35,7 @@ const MultiLevelNav: React.FC<MultiLevelNavProps> = ({
         text={text}
         leftElement={leftIcon && <IconFont name={leftIcon}></IconFont>}
         active={active}
+        to={to}
         onClick={onClick}
         rightElement={
           childrenInfo &&
@@ -56,7 +60,6 @@ const MultiLevelNav: React.FC<MultiLevelNavProps> = ({
         </div>
       )}{" "}
     </div>
-  );
-};
-
+  )
+}
 export default memo(MultiLevelNav);

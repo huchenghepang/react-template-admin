@@ -9,7 +9,7 @@ const iconfontUrl = [
   "//at.alicdn.com/t/c/font_4801317_9kjpq3ujtxs.js",
   "//at.alicdn.com/t/c/font_4817510_wp7edr2vfj.js",
   "//at.alicdn.com/t/c/font_4818206_a49yat5yptg.js",
-  "https://at.alicdn.com/t/c/font_4801317_zom0gpxkxkk.js",
+  "https://at.alicdn.com/t/c/font_4801317_xlagbc1f7os.js",
 ];
 
 export type IconName = MessageComponentIcon | ReactTemplateIcon | SearchFrameIcon;

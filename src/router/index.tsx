@@ -1,9 +1,11 @@
 import { lazy, memo, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, RouteObject, useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import PrivateRoute from "../components/PreviateRoute/PreviateRoute";
 import { RootDispatch, RootState } from "../store";
+import { saveRouters } from "../store/slices/routerSlice";
 import { fetchUserInfoData } from "../store/slices/userSlice";
+import { removeElementFromRoutes } from "../utils/router";
 import { filterRoutesByPermission } from "../utils/routeUtils";
 import DynamicRoutesConfig from "./DynamicRoutes";
 // 显式声明 Layout 组件的类型
@@ -13,80 +15,94 @@ const Login = lazy(() => import("../pages/Login/Login"));
 const Layout = lazy(() => import("../layouts/Layout"));
 const NoFound = lazy(() => import("../pages/NoFound/NoFound"));
 
-const AppRoutesNoMemo = () => {
-  /* 获取登录状态 */
 
+
+
+const AppRoutesNoMemo = () => {
   const isLogin = useSelector(
     (state: RootState) => state.user.isLogin,
     (prev, next) => prev === next,
   );
+
   const status = useSelector(
     (state: RootState) => state.user.status,
     (prev, next) => prev === next,
   );
 
   const dispatch = useDispatch<RootDispatch>();
+
   useEffect(() => {
-    // 在页面加载时触发 fetchUserInfoData 异步请求
     if (isLogin && status === "idle") {
       dispatch(fetchUserInfoData()).catch((error) => {
         console.error("Failed to fetch user info:", error);
       });
     }
-  }, [dispatch, isLogin, status]); // 确保在组件挂载时只调用一次
+  }, [dispatch, isLogin, status]);
 
+  // 优化 `permissions`
   const permissions = useSelector(
-    (state: RootState) =>
-      state.user.permissions?.map((perm) => perm.permission_name) || [],
-    (prev, next) => JSON.stringify(prev) === JSON.stringify(next), // 自定义浅比较
+    (state: RootState) => state.user.permissions,
+    (prev, next) => prev === next,
   );
 
-  // 根据权限动态过滤路由
-  const filteredRoutes = useMemo(() => {
-    return filterRoutesByPermission(DynamicRoutesConfig, permissions);
+  const permissionNames = useMemo(() => {
+    return permissions?.map((perm) => perm.permission_name) || [];
   }, [permissions]);
 
-  const routes: RouteObject[] = useMemo(
+  // 优化 `filteredRoutes`
+  const filteredRoutes = useMemo(() => {
+    return filterRoutesByPermission(DynamicRoutesConfig, permissionNames);
+  }, [permissionNames]);
+
+  useEffect(() => {
+    dispatch(saveRouters(removeElementFromRoutes(filteredRoutes)));
+  }, [filteredRoutes, dispatch]);
+
+  // 预先计算静态 routes
+  const staticRoutes = useMemo(
     () => [
       {
         path: "/",
-        element: <Navigate to={isLogin ? "/dashboard" : "/login"}></Navigate>,
+        element: <Navigate to={isLogin ? "/dashboard" : "/login"} />,
       },
-      {
-        path: "/login",
-        element: <Login></Login>,
-      },
+      { path: "/login", element: <Login /> },
+      { path: "*", element: <NoFound /> },
+    ],
+    [isLogin],
+  );
+
+  // 计算 `dashboardRoutes`
+  const dashboardRoutes = useMemo(
+    () => [
       {
         path: "/dashboard",
-        element: <PrivateRoute isLoggedIn={isLogin}></PrivateRoute>,
+        element: <PrivateRoute isLoggedIn={isLogin} />,
         children: [
           {
             path: "/dashboard",
-            element: <Layout />, // 如果通过 PrivateRoute 检查，渲染 Layout
+            element: <Layout />,
             children: [
               {
                 index: true,
                 element: <Navigate to="/dashboard/home" replace />,
-              }, 
-              {
-                path: "/dashboard/home",
-                element: <DashboardHome></DashboardHome>,
               },
+              { path: "/dashboard/home", element: <DashboardHome /> },
               ...filteredRoutes,
             ],
           },
         ],
       },
-      {
-        path: "*",
-        element: <NoFound></NoFound>,
-      },
     ],
     [filteredRoutes, isLogin],
   );
 
-  const element = useRoutes(routes);
-  return element;
+  // 最终 routes
+  const routes = useMemo(
+    () => [...staticRoutes, ...dashboardRoutes],
+    [staticRoutes, dashboardRoutes],
+  );
+
+  return useRoutes(routes);
 };
 
 const AppRoutes = memo(AppRoutesNoMemo);

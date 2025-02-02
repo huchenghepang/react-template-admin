@@ -3,7 +3,7 @@ import zhCN from "antd/locale/zh_CN";
 import { Suspense } from "react";
 import { BrowserRouter } from "react-router-dom";
 import "./App.scss";
-import Loading from "./pages/Loading/Loading";
+import Loading from "./pages/Dashboard/Loading/Loading";
 import AppRoutes from "./router";
 
 

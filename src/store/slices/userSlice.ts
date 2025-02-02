@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getComplexLocalStorage, getLocalStorage, setComplexLocalStorage } from "../../utils/localStorage";
-import type { UserData } from './../../interface/response/login.r.d';
+import type { CurrentRole, Permission, UserData } from './../../interface/response/login.r.d';
 import { reqUserInfo } from './../../serices/api/user';
 import { RootState } from './../index';
 
@@ -60,6 +60,10 @@ const userSlice = createSlice({
             const status = "succeeded";
             return { ...state, status, ...action.payload }
         },
+        changeRole(state, action: PayloadAction<{ permissions: Permission[],currentRole:CurrentRole }>){
+            state =  {...state,permissions:action.payload.permissions,currentRole:action.payload.currentRole}
+            setComplexLocalStorage("user",state)
+        }
     },
     extraReducers: (builder) => {
         // 处理 createAction 定义的 action
@@ -90,7 +94,7 @@ const userSlice = createSlice({
 
 
 
-export const { updateUserInfo } = userSlice.actions
+export const { updateUserInfo, changeRole } = userSlice.actions
 const userReducer = userSlice.reducer;
 export default userReducer
 

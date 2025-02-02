@@ -24,9 +24,13 @@ export type MessageComponentIcon =
  * 项目名: react-template
  * 英文名: react-template
  * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4801317
- * 在线地址: https://at.alicdn.com/t/c/font_4801317_u5cjxznanff.js
+ * 在线地址: https://at.alicdn.com/t/c/font_4801317_xlagbc1f7os.js
  */
 export type ReactTemplateIcon =
+    | "icon-shezhi"
+    | "icon-yonghuguanli_huaban"
+    | "icon-zhuye"
+    | "icon-top"
     | "icon-ok-circle"
     | "icon-form"
     | "icon-qiapian001"
@@ -42,7 +46,6 @@ export type ReactTemplateIcon =
     | "icon-fenlei"
     | "icon-fanhui"
     | "icon-github"
-    | "icon-top"
     ;
 /**
  * 项目名: 电脑文件夹图标
@@ -160,4 +163,12 @@ export type SvgIcon =
     | "icon-fendouzhe"
     | "icon-info"
     ;
-
+/**
+ * 项目名: svg
+ * 英文名: svg
+ * 下载地址: https://www.iconfont.cn/api/project/download.zip?pid=4595126
+ * 在线地址: None
+ */
+export type SvgIcon =
+    | "icon-info"
+    ;
