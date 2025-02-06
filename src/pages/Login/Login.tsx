@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import IconFont from "../../components/Iconfont/Iconfont";
 
 import { showMessage } from "../../components/message/MessageManager";
+import Turnstile from "../../components/Turnstile/Turnstile";
 import { useFormReducer } from "../../hooks/useFormReducer";
 import { registerAddSchema } from "../../schema/user";
 import { validate } from "../../schema/validate";
@@ -35,7 +36,7 @@ const Login: React.FC<LoginProps> = () => {
   }, [isLogin, navigate]);
 
   const [isGithubLogin, setIsGithubLogin] = useState(false);
-
+  const [isHuman, setHunman] = useState(false);
   const [errors, setErrors] = useState<FormType>({});
 
   const toggleLoginMethod = () => {
@@ -51,7 +52,7 @@ const Login: React.FC<LoginProps> = () => {
   /* 提交表单 */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-
+    if (!isHuman) return showMessage({ type: "tip", text: "请先进行人机验证" });
     validate(registerAddSchema, formState)
       .then(({ valid, errors }) => {
         if (!valid) {
@@ -69,11 +70,12 @@ const Login: React.FC<LoginProps> = () => {
         return reqLogin(formState);
       })
       .then(({ success, errorMessage, data }) => {
-        if (!success)
-          showMessage({
+        if (!success) {
+          return showMessage({
             type: "tip",
             text: "登录失败," + errorMessage,
           });
+        }
 
         /* 登录成功处理数据 */
         showMessage({
@@ -99,6 +101,10 @@ const Login: React.FC<LoginProps> = () => {
   const resetError = () => {
     setErrors({});
   };
+
+  const verifiedResultHandler = useCallback((success: boolean) => {
+    setHunman(success);
+  }, []);
 
   return (
     <div className={loginStyle["Login-Container"]}>
@@ -151,6 +157,7 @@ const Login: React.FC<LoginProps> = () => {
           />
 
           <p className={loginStyle["Login-Error"]}>{errors.password}</p>
+          <Turnstile verifiedResultHandler={verifiedResultHandler}></Turnstile>
           <button type="submit" className={loginStyle["Login-Button"]}>
             登录
           </button>
