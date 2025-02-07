@@ -1,0 +1,15 @@
+.tabletop-Container {
+  background-color: #fff;
+  border: 0px solid rgba(0, 0, 0, 0.88);
+  border-radius: 2px;
+  width: 1184px;
+  height: 80px;
+  display: flex;
+  justify-content: space-around;
+
+  .tabtop-section-left,.tabtop-section-center,.tabtop-section-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

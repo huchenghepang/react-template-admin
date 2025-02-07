@@ -12,3 +12,4 @@ type CurrentRole = {
 }
 /* 切换角色 */
 export const reqChangeRole = async (data: change_role_Interface) => await Request.post<{ token: string; permissions: Permission[], currentRole: CurrentRole }>("/user/change-role",data)
+

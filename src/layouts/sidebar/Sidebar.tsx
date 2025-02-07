@@ -35,7 +35,7 @@ export const Sidebar: FC = () => {
     () => (
       <aside className="sidebar-container clearfix">
         <div className="dashboard-title clearfix">
-          <h2>Hope UI</h2>
+          <h2>天空后台</h2>
         </div>
         <div className="sidebar-itemlist">
           <div className="home-section sidebar-section">
