@@ -8,7 +8,15 @@ export interface Pagination {
     limit: number;
 }
 
+
+type RoleINFO  = {
+    "roleId": number,
+    "roleName": string,
+    "description": string
+} | null
+
 export interface UserList {
+    total:number;
     account: string;
     avatar: null;
     email: null;
@@ -20,4 +28,5 @@ export interface UserList {
     signature: null;
     user_id: string;
     username: string;
+    roles: RoleINFO[]
 }

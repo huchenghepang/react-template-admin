@@ -4,11 +4,12 @@ import { getComplexLocalStorage, getLocalStorage, setComplexLocalStorage } from 
 import type { CurrentRole, Permission, UserData } from './../../interface/response/login.r.d';
 import { reqUserInfo } from './../../serices/api/user';
 import { RootState } from './../index';
+import { ASYNC_FETCH_STATUS } from "../../interface/store/normal";
 
 // 定义状态的接口，包含一个数字类型的字段 value
 
 type LoginState = {
-    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    status: ASYNC_FETCH_STATUS;
     isLogin: boolean;
 }
 

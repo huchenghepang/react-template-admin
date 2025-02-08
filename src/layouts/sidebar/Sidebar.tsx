@@ -39,13 +39,13 @@ export const Sidebar: FC = () => {
         </div>
         <div className="sidebar-itemlist">
           <div className="home-section sidebar-section">
-            <h3 className="sidebar-title-3">Home</h3>
+            <h3 className="sidebar-title-3">主界面</h3>
             <div className="section-detail">
               <MultiLevelNav text="主页" leftIcon="icon-zhuye" to={"/dashboard/home"}></MultiLevelNav>
             </div>
           </div>
           <div className="pages-section sidebar-section">
-            <h3 className="sidebar-title-3">Pages</h3>
+            <h3 className="sidebar-title-3">页面</h3>
             <div className="section-detail">
               {children.map((navItem,index)=>{
                 return <MultiLevelNav key={index} {...navItem}></MultiLevelNav>;
@@ -53,7 +53,7 @@ export const Sidebar: FC = () => {
             </div>
           </div>
           <div className="elements-section sidebar-section">
-            <h3 className="sidebar-title-3">Elements</h3>
+            <h3 className="sidebar-title-3">组件</h3>
             <div className="section-detail">
               <div className="sidebar-nav-item">
                 <div className="left-info"></div>

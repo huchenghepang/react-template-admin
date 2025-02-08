@@ -14,6 +14,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "antd": "^5.23.1",
     "axios": "^1.7.9",
+    "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
