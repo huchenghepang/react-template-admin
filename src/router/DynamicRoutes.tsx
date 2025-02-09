@@ -11,8 +11,8 @@ const DashboardUser = lazy(() => import("../pages/Dashboard/User/User"));
 const DashboardComponent = lazy(
   () => import("../pages/Dashboard/Component/Component"),
 );
-
-type Permission = "home" | "setting" | "user" | "component";
+const RoleBoardRole = lazy(()=>import("../pages/Dashboard/Role/Role"))
+type Permission = "home" | "setting" | "user" | "component" | "role";
 
 /* 定义路由与权限的映射关系 */
 export type PermissionRoute = RouteObject & {
@@ -44,6 +44,13 @@ const DynamicRoutesConfig: PermissionRoute[] = [
     routeName:"组件",
     icon:"icon-components"
   },
+  {
+    path:"/dashboard/role",
+    element:<RoleBoardRole></RoleBoardRole>,
+    permission:"role",
+    routeName:"角色管理",
+    icon:"icon-renzhengAuthentication"
+  }
 ];
 
 export default DynamicRoutesConfig;

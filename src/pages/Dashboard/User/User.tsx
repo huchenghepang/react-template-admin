@@ -10,6 +10,7 @@ import {
   Space,
   Switch,
   Table,
+  TableColumnsType,
   TableProps,
   Tag,
   Tooltip,
@@ -26,11 +27,13 @@ import { registerAddSchema } from "../../../schema/user";
 import { validate } from "../../../schema/validate";
 import {
   reqAddUser,
+  reqAssignUserRoles,
   reqChangeUserStatus,
   reqDeleteUser,
   reqUsersRolesInfo,
 } from "../../../serices/api/admin";
 import UserStyle from "./User.module.scss";
+import UserRoleModal from "./UserRoleToast";
 
 // 定义组件的 Props 类型
 interface UserProps {
@@ -96,11 +99,38 @@ const User: React.FC<UserProps> = () => {
         console.log(error);
       }
     },
-    [setUserList],
+    [],
+  );
+
+  /* 分配用户角色 */
+  const AssignUserRolesReq = useCallback(
+    async (params: AssignUserRoles) => {
+      try {
+        const { success, errorMessage, message } =
+          await reqAssignUserRoles(params);
+        if (!success)
+          return showMessage({
+            type: "error",
+            text: errorMessage || "分配角色失败",
+          });
+        void getUserInfo({ page: pagination.page, limit: pagination.limit });
+        showMessage({
+          type: "success",
+          text: message || "分配用户角色成功",
+        });
+      } catch (error) {
+        showMessage({ type: "error", text: "分配用户角色出错" });
+        console.log(error);
+      }
+    },
+    [getUserInfo, pagination],
   );
   useEffect(() => {
     void getUserInfo({ page: pagination.page, limit: pagination.limit });
-  }, [getUserInfo]);
+  }, []);
+  const [dafaultSelectedRolevalue, setDafaultSelectedRolevalue] = useState<
+    number[]
+  >([]);
   // 提交表单
   const handleSubmit = async () => {
     try {
@@ -142,30 +172,23 @@ const User: React.FC<UserProps> = () => {
             text: errorMessage || "删除用户失败",
           });
         showMessage({ type: "success", text: message || "删除用户成功" });
-        if (pagination.limit === 1 && +pagination.page !== 1) {
-          console.log("执行");
-          setPagination({ ...pagination, page: pagination.page - 1 });
-          await getUserInfo({
-            page: pagination.page - 1,
-            limit: pagination.limit,
-          });
-        } else {
-          await getUserInfo({
-            page: pagination.page,
-            limit: pagination.limit,
-          });
-        }
+        const newPage =
+          pagination.page > 1 && userList.length === 1
+            ? pagination.page - 1
+            : pagination.page;
+        setPagination({ ...pagination, page: newPage });
+        await getUserInfo({ page: newPage, limit: pagination.limit });
       } catch {
         showMessage({ type: "error", text: "删除用户错误" });
       }
     },
-    [getUserInfo, pagination],
+    [getUserInfo, pagination, userList],
   );
   /* 重置密码 */
   const ResetUserPassword = useCallback(
     async (userId: string) => {
       try {
-        const {  success } = await reqChangeUserStatus({
+        const { success } = await reqChangeUserStatus({
           userId,
           type: "password",
         });
@@ -174,7 +197,7 @@ const User: React.FC<UserProps> = () => {
             type: "error",
             text: "重置密码失败",
           });
-        showMessage({ type: "success", text:  "重置密码成功" });
+        showMessage({ type: "success", text: "重置密码成功" });
 
         await getUserInfo({
           page: pagination.page,
@@ -186,16 +209,28 @@ const User: React.FC<UserProps> = () => {
     },
     [getUserInfo, pagination],
   );
+
+  const [currentUserId, setCurrentUserId] = useState<string>();
+  /* 点击分配用户角色 */
+  const assignUserRoles = useCallback((userId: string, roles: RoleINFO[]) => {
+    setCurrentUserId(userId);
+    const defaultValue: number[] = [];
+    roles.forEach((role) => {
+      if (role?.roleId) {
+        defaultValue.push(role?.roleId);
+      }
+    });
+    setDafaultSelectedRolevalue(defaultValue);
+    setShowUserRoleToToast(true);
+  }, []);
   /* 展示的表格列 */
-  const columns: TableProps<UserList>["columns"] = useMemo(
+  const columns: TableColumnsType<UserList> = useMemo(
     () => [
       {
         dataIndex: "user_id",
         key: "user_id",
         title: "用户ID",
-        ellipsis: {
-          showTitle: false,
-        },
+        ellipsis: true,
         render(user_id: string) {
           return (
             <Tooltip placement="topLeft" title={user_id}>
@@ -223,9 +258,7 @@ const User: React.FC<UserProps> = () => {
         title: "账号",
         dataIndex: "account",
         key: "account",
-        ellipsis: {
-          showTitle: false,
-        },
+        ellipsis: true,
         render(value: string) {
           return (
             <Tooltip placement="topLeft" title={value}>
@@ -246,9 +279,7 @@ const User: React.FC<UserProps> = () => {
         dataIndex: "email",
         title: "邮箱",
         key: "email",
-        ellipsis: {
-          showTitle: false,
-        },
+        ellipsis: true,
         render(value: string) {
           return (
             <Tooltip placement="topLeft" title={value}>
@@ -261,9 +292,7 @@ const User: React.FC<UserProps> = () => {
         dataIndex: "signature",
         key: "signature",
         title: "个性签名",
-        ellipsis: {
-          showTitle: false,
-        },
+        ellipsis: true,
         render(value: string) {
           return (
             <Tooltip placement="topLeft" title={value}>
@@ -339,12 +368,13 @@ const User: React.FC<UserProps> = () => {
             console.log(e);
           };
           const confirmReset: PopconfirmProps["onConfirm"] = () => {
-           void ResetUserPassword(record.user_id)
+            void ResetUserPassword(record.user_id);
           };
 
           const cancelReset: PopconfirmProps["onCancel"] = (e) => {
             console.log(e);
           };
+
           return (
             <Space size="small">
               <Popconfirm
@@ -357,7 +387,7 @@ const User: React.FC<UserProps> = () => {
                 cancelText="不了"
               >
                 <Button
-                  size="small"
+                  size="mini"
                   type="dashed"
                   styles={{ backgroundColor: "#f98181" }}
                 >
@@ -374,19 +404,30 @@ const User: React.FC<UserProps> = () => {
                 cancelText="不了"
               >
                 <Button
-                  size="small"
+                  size="mini"
                   type="dashed"
                   styles={{ backgroundColor: "#98eca1" }}
                 >
                   重置
                 </Button>
               </Popconfirm>
+
+              <Button
+                size="mini"
+                type="dashed"
+                onClick={() => assignUserRoles(record.user_id, record.roles)}
+                styles={{ backgroundColor: "green", color: "#ccc" }}
+              >
+                分配角色
+              </Button>
             </Space>
           );
         },
+        width: 200,
+        fixed: "left",
       },
     ],
-    [deleteUser],
+    [deleteUser, ResetUserPassword, assignUserRoles],
   );
 
   /* 表格配置 */
@@ -516,6 +557,23 @@ const User: React.FC<UserProps> = () => {
     userForm.resetFields();
   }, [setModalopen, userForm]);
 
+  /* 分配用户角色 */
+  const [isShowUserRoleToToast, setShowUserRoleToToast] = useState(false);
+
+  /* 提交分配权限 */
+  const submitAssignUserRoles = (selectedValue: (string | number)[]) => {
+    if (currentUserId && selectedValue.length > 0) {
+      void AssignUserRolesReq({
+        userId: currentUserId,
+        roleIds: selectedValue as number[],
+      });
+    } else {
+      showMessage({ type: "info", text: "必须选择一个角色" });
+    }
+  };
+  const closeAssignUserRoles = useCallback(() => {
+    setShowUserRoleToToast(false);
+  }, []);
   return (
     <div className={UserStyle["User-Container"]}>
       <TableTop
@@ -640,27 +698,38 @@ const User: React.FC<UserProps> = () => {
       </Form>
 
       {/* 用户表 */}
-      <Table<UserList>
-        {...tableProps}
-        columns={columns}
-        dataSource={userList.map((user) => ({
-          ...user,
-          key: user.user_id || user.username, // 这里保证 key 的唯一性
-        }))}
-        pagination={{
-          align: "center",
-          current: pagination.page,
-          pageSize: pagination.limit,
-          showTotal: showTotal,
-          total: pagination.total,
-          showSizeChanger: true,
-          pageSizeOptions: [1, 10, 20, 50, 100],
-          onChange: (page, pageSize) =>
-            void getUserInfo({ page: page, limit: pageSize }),
-          position: ["bottomCenter"],
-        }}
-        rowKey="user_id"
-      ></Table>
+      <div style={{ maxWidth: "97.5%", overflowX: "auto" }} className="clearfix">
+        <Table<UserList>
+          {...tableProps}
+          columns={columns}
+          dataSource={userList.map((user) => ({
+            ...user,
+            key: user.user_id || user.username, // 这里保证 key 的唯一性
+          }))}
+          pagination={{
+            align: "center",
+            current: pagination.page,
+            pageSize: pagination.limit,
+            showTotal: showTotal,
+            total: pagination.total,
+            showSizeChanger: true,
+            pageSizeOptions: [1, 10, 20, 50, 100],
+            onChange: (page, pageSize) =>
+              void getUserInfo({ page: page, limit: pageSize }),
+            position: ["bottomCenter"],
+          }}
+          scroll={{ scrollToFirstRowOnChange: true, y: 400 }}
+          rowKey="user_id"
+        ></Table>
+      </div>
+
+      {/* 分配用户角色 */}
+      <UserRoleModal
+        visible={isShowUserRoleToToast}
+        defaultValue={dafaultSelectedRolevalue}
+        onSubmit={submitAssignUserRoles}
+        onClose={closeAssignUserRoles}
+      ></UserRoleModal>
     </div>
   );
 };

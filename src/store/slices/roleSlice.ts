@@ -1,11 +1,11 @@
-import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../'; // 根据项目实际调整路径
 import { RolesInfoResponse } from '../../interface/response/role.r';
 import { reqRolesInfo } from '../../serices/api/role';
-import { ASYNC_FETCH_STATUS } from './../../interface/store/normal.d';
+import type { ASYNC_FETCH_STATUS } from './../../interface/store/normal.d';
 
 // 定义 Slice 状态类型
-interface RoleState {
+export interface RoleState {
     status: ASYNC_FETCH_STATUS;
     roles?:  RolesInfoResponse[]
 }
@@ -15,10 +15,9 @@ const initialState: RoleState = {
     status: 'idle'
 };
 
-export const getRolesInfo = createAction("/role/info")
 
 // 异步操作 获取角色列表信息
-export const fetchRolesInfoData = createAsyncThunk<RolesInfoResponse[], void, { state: RootState }>(getRolesInfo().type,async(_,thunkAPI)=>{
+export const fetchRolesInfoData = createAsyncThunk<RolesInfoResponse[], void, { state: RootState }>("/role/info",async(_,thunkAPI)=>{
     try {
         const {data,success,errorMessage} = await reqRolesInfo();
         if(!success) return thunkAPI.rejectWithValue(errorMessage || "无法获取角色信息")

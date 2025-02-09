@@ -12,3 +12,6 @@ export const reqDeleteUser = async (params: RemoveUserParam) => await Request.po
 
 /* 更新用户状态 */
 export const reqChangeUserStatus = async (params: ChangeUserStatus) => await Request.post("/admin/user/status", params)
+
+/* 分配用户角色 */
+export const reqAssignUserRoles = async (params: AssignUserRoles) => await Request.post("/admin/user/role/assign",params)
